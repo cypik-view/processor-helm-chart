@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: processor
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: processor
+  template:
+    metadata:
+      labels:
+        app: processor
+    spec:
+      containers:
+        - name: processor
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          volumeMounts:
+            - name: view-json
+              mountPath: /app/config
+              subPath: view.json
+              readOnly: false
+            - name: shared-storage
+              mountPath: /app/assets
+              subPath: assets
+            - name: shared-storage
+              mountPath: /app/logs
+              subPath: logs
+            - name: shared-storage
+              mountPath: /app/temp
+              subPath: temp
+            - name: shared-storage
+              mountPath: /app/dataflowlogs
+              subPath: dataflowlogs
+            - name: shared-storage
+              mountPath: /app/metadata
+              subPath: metadata
+            - name: shared-storage
+              mountPath: /app/webhookreq
+              subPath: webhookreq
+            - name: shared-storage
+              mountPath: /app/webhookresp
+              subPath: webhookresp
+            - name: shared-storage
+              mountPath: /app/controllog
+              subPath: controllog
+            - name: shared-storage
+              mountPath: /app/controlapi
+              subPath: controlapi
+            - name: shared-storage
+              mountPath: /app/controltoken
+              subPath: controltoken
+      volumes:
+        - name: view-json
+          configMap:
+            name: processor-config
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: processor-pvc
