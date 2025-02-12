@@ -1,19 +1,20 @@
+# deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: processor
+  name: {{ .Values.service.name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: processor
+      app: {{ .Values.service.name }}
   template:
     metadata:
       labels:
-        app: processor
+        app: {{ .Values.service.name }}
     spec:
       containers:
-        - name: processor
+        - name: {{ .Values.service.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
@@ -22,44 +23,16 @@ spec:
               value: "{{ $value }}"
             {{- end }}
           volumeMounts:
-            - name: view-json
-              mountPath: /app/config
-              subPath: view.json
-              readOnly: false
-            - name: shared-storage
-              mountPath: /app/assets
-              subPath: assets
-            - name: shared-storage
-              mountPath: /app/logs
-              subPath: logs
-            - name: shared-storage
-              mountPath: /app/temp
-              subPath: temp
-            - name: shared-storage
-              mountPath: /app/dataflowlogs
-              subPath: dataflowlogs
-            - name: shared-storage
-              mountPath: /app/metadata
-              subPath: metadata
-            - name: shared-storage
-              mountPath: /app/webhookreq
-              subPath: webhookreq
-            - name: shared-storage
-              mountPath: /app/webhookresp
-              subPath: webhookresp
-            - name: shared-storage
-              mountPath: /app/controllog
-              subPath: controllog
-            - name: shared-storage
-              mountPath: /app/controlapi
-              subPath: controlapi
-            - name: shared-storage
-              mountPath: /app/controltoken
-              subPath: controltoken
+            {{- range .Values.volumes.mountPaths }}
+            - name: {{ $.Values.volumes.sharedStorageName }}
+              mountPath: {{ .path }}
+              subPath: {{ .subPath }}
+              readOnly: {{ .readOnly | default false }}
+            {{- end }}
       volumes:
-        - name: view-json
+        - name: {{ .Values.volumes.configMapName }}
           configMap:
-            name: processor-config
-        - name: shared-storage
+            name: {{ .Values.volumes.configMapName }}
+        - name: {{ .Values.volumes.sharedStorageName }}
           persistentVolumeClaim:
-            claimName: processor-pvc
+            claimName: {{ .Values.persistence.claimName }}

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: processor-pvc
+  name: {{ .Values.persistence.claimName }}
 spec:
   accessModes:
     - {{ .Values.persistence.accessMode }}
