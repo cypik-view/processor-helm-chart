@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  processor:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-02-12T10:52:55.598337051+05:30"
+    description: A Helm chart for Kubernetes
+    digest: a65b8abd689073ea1432df5e6b32b5b411c5759ed9eb963dac2ef78f229f9e98
+    name: processor
+    type: application
+    urls:
+    - processor-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-02-12T10:52:55.59737505+05:30"
